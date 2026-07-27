@@ -14,10 +14,11 @@ def test_binary_sources_map_toxic_to_explicit():
     assert harmonize("textdetox", "toxic") == 1
     assert harmonize("textdetox", "neutral") == 0
 
-def test_toxicn_keeps_implicit():
-    assert harmonize("toxicn", "implicit") == 2
-    assert harmonize("toxicn", "explicit") == 1
-    assert harmonize("toxicn", "non") == 0
+def test_toxicn_expression_mapping():
+    assert harmonize("toxicn", 0) == 0
+    assert harmonize("toxicn", 1) == 1
+    assert harmonize("toxicn", 2) == 2
+    assert harmonize("toxicn", 3) == 3
 
 def test_unknown_label_drops_row():
     assert harmonize("cold", 99) is None

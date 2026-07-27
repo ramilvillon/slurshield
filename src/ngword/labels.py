@@ -7,7 +7,7 @@ _MAPS = {
     "conda":     {"O": 0, "E": 1, "I": 2, "A": 3},
     "mginoben":  {0: 0, 1: 1, "0": 0, "1": 1},
     "cold":      {0: 0, 1: 1, "0": 0, "1": 1},
-    "toxicn":    {"non": 0, "explicit": 1, "implicit": 2},
+    "toxicn":    {0: 0, 1: 1, 2: 2, 3: 3, "0": 0, "1": 1, "2": 2, "3": 3},
     "textdetox": {"neutral": 0, "toxic": 1},
     "llmjp":     {"non": 0, "toxic": 1},
 }

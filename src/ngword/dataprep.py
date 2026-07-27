@@ -20,8 +20,8 @@ def stratified_split(rows: list[dict], seed: int = 42):
         group = buckets[key]
         rng.shuffle(group)
         n = len(group)
-        n_test = max(1, int(n * 0.1))
-        n_val = max(1, int(n * 0.1))
+        n_test = int(n * 0.1)
+        n_val = int(n * 0.1)
         test += group[:n_test]
         val += group[n_test:n_test + n_val]
         train += group[n_test + n_val:]
@@ -41,12 +41,13 @@ def _load_conda() -> list[dict]:
 
 def _load_hf_mginoben() -> list[dict]:
     from datasets import load_dataset
-    ds = load_dataset("mginoben/tagalog-profanity-dataset", split="train")
     out = []
-    for r in ds:
-        lab = harmonize("mginoben", r["label"])
-        if lab is not None:
-            out.append({"text": r["text"], "label": lab, "lang": "tl", "source": "mginoben"})
+    for split in ("train", "validation"):
+        ds = load_dataset("mginoben/tagalog-profanity-dataset", split=split)
+        for r in ds:
+            lab = harmonize("mginoben", r["label"])
+            if lab is not None:
+                out.append({"text": r["text"], "label": lab, "lang": "tl", "source": "mginoben"})
     return out
 
 
@@ -112,7 +113,7 @@ def build() -> None:
     rows += _load_textdetox("zh")
     rows += _load_textdetox("ja")
     rows += _load_raw_csv("cold.csv", "cold", "zh", "TEXT", "label")
-    rows += _load_raw_csv("toxicn.csv", "toxicn", "zh", "content", "toxic_type")
+    rows += _load_raw_csv("toxicn.csv", "toxicn", "zh", "content", "expression")
     rows += _load_raw_csv("llmjp.csv", "llmjp", "ja", "text", "label", segment=True)
 
     rows = dedup(rows)

@@ -7,7 +7,7 @@ Auto-downloaded by dataprep.build():
 
 Manual download required (place CSVs under data/raw/):
 - COLD (zh): https://github.com/thu-coai/COLDataset -> data/raw/cold.csv (cols: TEXT, label)
-- ToxiCN (zh): https://github.com/DUT-lujunyu/ToxiCN -> data/raw/toxicn.csv (cols: content, toxic_type in {non,explicit,implicit})
+- ToxiCN (zh): https://github.com/DUT-lujunyu/ToxiCN -> data/raw/toxicn.csv (cols: content, expression, where expression is int 0-3: 0=non-hate, 1=explicit, 2=implicit, 3=reporting)
 - LLM-jp v2 (ja): https://llm-jp.nii.ac.jp/... -> data/raw/llmjp.csv (cols: text, label)
 
 Held-out adversarial eval (do NOT train on):
