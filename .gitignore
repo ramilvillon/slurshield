@@ -1,0 +1,6 @@
+data/
+*.onnx
+__pycache__/
+.pytest_cache/
+final_model/
+checkpoints/
