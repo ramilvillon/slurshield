@@ -46,7 +46,7 @@ def main():
     model = AutoModelForSequenceClassification.from_pretrained(config.BACKBONE, num_labels=4).to(device)
 
     train_ds, val_ds = _load("train"), _load("val")
-    weights = compute_class_weight("balanced", classes=np.arange(4),
+    weights = compute_class_weight("balanced", classes=np.arange(len(config.CLASS_NAMES)),
                                    y=np.array(train_ds["label"]))
     class_weights = torch.tensor(weights, dtype=torch.float)
 
