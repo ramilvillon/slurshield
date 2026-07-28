@@ -11,3 +11,4 @@ Task 5: complete (commits 12ac259..9b9a2b6, review clean after 1 fix cycle: Toxi
 Task 8: complete (commits 9b9a2b6..c73a484, review clean)
 BOUNDARY: Tasks 3, 6, 7 blocked on heavy-dep install (torch/transformers/optimum ~GB) + manual COLD/ToxiCN downloads + overnight training. Deferred to user.
 Task 3: complete (commit 3a7655c, mmbert-small confirmed on MPS, loss=2.2508)
+Task 6: complete (commits f9b4e87..b2deacb, review clean after 1 fix: report() returns per-class F1)
