@@ -13,3 +13,8 @@ BOUNDARY: Tasks 3, 6, 7 blocked on heavy-dep install (torch/transformers/optimum
 Task 3: complete (commit 3a7655c, mmbert-small confirmed on MPS, loss=2.2508)
 Task 6: complete (commits f9b4e87..b2deacb, review clean after 1 fix: report() returns per-class F1)
 Task 7: complete (commit 36d7661, int8 ONNX export of mmbert-small proven end-to-end on throwaway model)
+FINAL whole-branch review (opus): READY TO MERGE. All invariants hold, 25 passed/2 skipped.
+Tracked post-merge follow-ups (non-blocking):
+  - Adversarial eval hook not wired (spec §6/§11); needs hand-collected obfuscation data.
+  - ToxiCN toxic-first collapse in SOURCES.md prose only, not in _load_raw_csv (rebuild footgun).
+REMAINING (user-run): overnight `python -m ngword.train` -> `python -m ngword.export` -> `python -m ngword.evaluate_model`.
