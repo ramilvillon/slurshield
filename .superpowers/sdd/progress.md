@@ -18,3 +18,4 @@ Tracked post-merge follow-ups (non-blocking):
   - Adversarial eval hook not wired (spec §6/§11); needs hand-collected obfuscation data.
   - ToxiCN toxic-first collapse in SOURCES.md prose only, not in _load_raw_csv (rebuild footgun).
 REMAINING (user-run): overnight `python -m ngword.train` -> `python -m ngword.export` -> `python -m ngword.evaluate_model`.
+Post-training FIX: names.py length-tiered matching (was over-blocking Alex/Phoenix/Model/etc via short-substring matches). 31 tests pass.
