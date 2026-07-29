@@ -21,8 +21,9 @@ Manual download required (place CSVs under data/raw/). Exact prep recipe used (r
   1,847 long docs; dataprep segments them into short chunks (segment=True). WARNING: chunks inherit the
   document-level label, so ja is lower-confidence (many "explicit" chunks are neutral sentences). See spec §7.
 
-Held-out adversarial eval (do NOT train on):
-- PCR-ToxiCN / ToxiCloakCN (zh) -> data/adversarial/zh.csv
-- hand-built leetspeak (en) -> data/adversarial/en.csv
+Held-out adversarial eval (do NOT train on) — scored by evaluate_model.adversarial_report()
+at the block/allow level (clean vs not-clean). Each file: cols text,label (0=clean,1=toxic).
+- data/adversarial/en.csv — hand-built leetspeak/spacing/unicode/homoglyph evasion + clean controls (present).
+- data/adversarial/zh.csv — PCR-ToxiCN / ToxiCloakCN (TODO: drop in to measure zh obfuscation robustness).
 
 LICENSING: mginoben = unknown, CONDA = no license file. Dev-only. Clear or replace before any commercial ship.
