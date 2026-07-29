@@ -1,4 +1,16 @@
-from ngword.dataprep import stratified_split
+from ngword.dataprep import stratified_split, _toxicn_class
+
+
+def test_toxicn_toxic_first_collapse():
+    # clean only when toxic==0; the 816 toxic-but-untyped (expression=0) rows -> explicit
+    assert _toxicn_class(0, 0) == 0
+    assert _toxicn_class(1, 0) == 1
+    assert _toxicn_class(1, 1) == 1
+    assert _toxicn_class(1, 2) == 2
+    assert _toxicn_class(1, 3) == 3
+    # pre-collapsed file (no `toxic` column): expression passes through unchanged
+    assert _toxicn_class(None, 2) == 2
+    assert _toxicn_class(None, 0) == 0
 
 
 def _rows():

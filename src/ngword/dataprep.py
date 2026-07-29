@@ -84,6 +84,38 @@ def _load_raw_csv(name: str, source: str, lang: str, text_col: str, label_col: s
     return out
 
 
+def _toxicn_class(toxic, expression) -> int | None:
+    # ToxiCN's raw `expression` (0=non-hate,1=explicit,2=implicit,3=reporting) mislabels
+    # 816 genuinely-toxic rows as expression=0. Collapse toxic-first: clean only when
+    # toxic==0; untyped-toxic folds to explicit. Handles the raw file (has `toxic`) and a
+    # pre-collapsed file (expression already 0-3, no `toxic` column).
+    try:
+        expr = int(expression)
+    except (TypeError, ValueError):
+        return None
+    if toxic is None or (isinstance(toxic, float) and pd.isna(toxic)):
+        return harmonize("toxicn", expr)  # pre-collapsed: identity map
+    return 0 if int(toxic) == 0 else (expr if expr in (1, 2, 3) else 1)
+
+
+def _load_toxicn() -> list[dict]:
+    path = _RAW / "toxicn.csv"
+    if not path.exists():
+        print("SKIP toxicn.csv (not found — see data/SOURCES.md)")
+        return []
+    df = pd.read_csv(path)
+    has_toxic = "toxic" in df.columns
+    out = []
+    for _, r in df.iterrows():
+        text = r.get("content")
+        if not isinstance(text, str):
+            continue
+        lab = _toxicn_class(r["toxic"] if has_toxic else None, r.get("expression"))
+        if lab is not None:
+            out.append({"text": text, "label": lab, "lang": "zh", "source": "toxicn"})
+    return out
+
+
 def _segment(text: str) -> list[str]:
     # ja long-doc handling: split on sentence enders, keep chat-length chunks only.
     import re
@@ -113,7 +145,7 @@ def build() -> None:
     rows += _load_textdetox("zh")
     rows += _load_textdetox("ja")
     rows += _load_raw_csv("cold.csv", "cold", "zh", "TEXT", "label")
-    rows += _load_raw_csv("toxicn.csv", "toxicn", "zh", "content", "expression")
+    rows += _load_toxicn()
     rows += _load_raw_csv("llmjp.csv", "llmjp", "ja", "text", "label", segment=True)
 
     rows = dedup(rows)

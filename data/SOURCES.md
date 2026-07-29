@@ -10,12 +10,11 @@ Manual download required (place CSVs under data/raw/). Exact prep recipe used (r
 - COLD (zh) -> data/raw/cold.csv (cols: TEXT, label). Source repo: https://github.com/thu-coai/COLDataset
   Recipe: concat COLDataset/{train,dev,test}.csv, keep columns [TEXT, label]. ~37,480 rows.
 
-- ToxiCN (zh) -> data/raw/toxicn.csv (cols: content, expression as int 0-3 = clean/explicit/implicit/action).
-  Source: https://raw.githubusercontent.com/DUT-lujunyu/ToxiCN/main/ToxiCN_1.0.csv
-  NOTE: the raw `expression` column is NOT directly usable — 816 genuinely toxic rows carry expression=0.
-  Recipe (toxic-first collapse): class = 0 if toxic==0 else (expression if expression in {1,2,3} else 1).
-  This keeps clean only when toxic==0 and folds untyped-toxic rows into explicit. ~12,011 rows.
-  Resulting dist: clean 5550 / explicit 3553 / implicit 1995 / action 913.
+- ToxiCN (zh) -> data/raw/toxicn.csv. Source: https://raw.githubusercontent.com/DUT-lujunyu/ToxiCN/main/ToxiCN_1.0.csv
+  Just save the raw file (keep columns `content, toxic, expression`). `dataprep._load_toxicn` applies the
+  toxic-first collapse IN CODE: clean only when toxic==0; the 816 toxic-but-untyped (expression=0) rows fold
+  to explicit; expression 1/2/3 -> explicit/implicit/action. A pre-collapsed 2-col file (content, expression)
+  also loads correctly. ~12,011 rows -> clean 5550 / explicit 3553 / implicit 1995 / action 913.
 
 - LLM-jp v2 (ja) -> data/raw/llmjp.csv (cols: text, label as {non|toxic}). Source: HF `p1atdev/LLM-jp-Toxicity-Dataset`.
   Recipe: label = "non" if raw label=="nontoxic" else "toxic" (folds "toxic" + "has_toxic_expression" -> toxic).
