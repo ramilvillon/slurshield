@@ -11,6 +11,12 @@ def test_title_uses_matcher_path():
     r = classify("scunthorpe united", "title")
     assert r["decision"] == "allow"
 
+def test_chat_prefilter_blocks_obfuscated_profanity_without_model():
+    # The deobfuscation pre-filter fires before the model loads, so no model needed.
+    r = classify("sh1t player uninstall", "chat")
+    assert r["decision"] == "block"
+    assert r["reason"].startswith("prefilter:")
+
 def test_empty_input_does_not_crash():
     r = classify("", "chat")
     assert r["decision"] in ("allow", "block")

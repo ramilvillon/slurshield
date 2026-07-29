@@ -1,4 +1,14 @@
-from ngword.names import check_name
+from ngword.names import check_name, profanity_hit
+
+
+def test_profanity_hit_catches_obfuscation():
+    assert profanity_hit("sh1t player") is not None
+    assert profanity_hit("what an assh0le") is not None
+    assert profanity_hit("ＦＵＣＫ off") is not None
+
+def test_profanity_hit_ignores_clean_scunthorpe():
+    for s in ["class starts in 5", "assemble at mid", "great analysis", "i need to pass"]:
+        assert profanity_hit(s) is None, s
 
 
 def test_obvious_profanity_blocks():

@@ -86,23 +86,29 @@ def _covered_by_allowlist(shadow: str, start: int, end: int) -> bool:
     return False
 
 
-def check_name(text: str) -> dict:
+def profanity_hit(text: str) -> str | None:
+    # Return the matched slur (deobfuscated) or None. Length-tiered + allowlist-aware,
+    # so "class"/"assemble" don't trip on "ass". Shared by check_name and the chat
+    # pre-filter — catches leetspeak/unicode/homoglyph evasion the raw-text model misses.
     for raw in _raw_tokens(text):
-        forms = _token_forms(raw)
-        if forms & _IMPERSONATION_TERMS:
-            return {"decision": "block", "reason": "impersonation"}
-        hit = forms & _SHORT_PROFANITY
+        hit = _token_forms(raw) & _SHORT_PROFANITY
         if hit:
-            return {"decision": "block", "reason": sorted(hit)[0]}
+            return sorted(hit)[0]
 
     shadow = fold(text)
-    if not shadow:
-        return {"decision": "allow", "reason": "clean"}
-
     for end_idx, term in _LONG_PROFANITY.iter(shadow):
         start_idx = end_idx - len(term) + 1
-        if _covered_by_allowlist(shadow, start_idx, end_idx):
-            continue
-        return {"decision": "block", "reason": term}
+        if not _covered_by_allowlist(shadow, start_idx, end_idx):
+            return term
+    return None
 
+
+def check_name(text: str) -> dict:
+    for raw in _raw_tokens(text):
+        if _token_forms(raw) & _IMPERSONATION_TERMS:
+            return {"decision": "block", "reason": "impersonation"}
+
+    hit = profanity_hit(text)
+    if hit:
+        return {"decision": "block", "reason": hit}
     return {"decision": "allow", "reason": "clean"}

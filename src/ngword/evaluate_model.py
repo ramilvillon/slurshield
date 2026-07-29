@@ -60,13 +60,12 @@ def adversarial_report(model_dir: str = "final_model") -> dict:
         print("\nNo adversarial sets in data/adversarial/ — skipping.")
         return {}
 
-    tok, model = _load(model_dir)
+    from ngword.infer import classify  # measure the SHIPPING pipeline (pre-filter + model)
     out = {}
     print("\n=== Adversarial robustness (block = predicted not-clean) ===")
     for f in files:
         df = pd.read_csv(f)
-        preds = _predict(df["text"], tok, model)
-        pred_toxic = [p != 0 for p in preds]
+        pred_toxic = [classify(t, "chat")["decision"] == "block" for t in df["text"]]
         true_toxic = [lab != 0 for lab in df["label"]]
 
         toxic = sum(true_toxic)
