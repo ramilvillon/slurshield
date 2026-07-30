@@ -1,6 +1,10 @@
+from pathlib import Path
+
 import pytest
 
 from ngword.infer import classify
+
+_MODEL = Path(__file__).resolve().parents[1] / "src" / "ngword" / "model" / "model_quantized.onnx"
 
 
 def test_name_routes_to_matcher():
@@ -22,10 +26,8 @@ def test_empty_input_does_not_crash():
     assert r["decision"] in ("allow", "block")
 
 def test_chat_returns_four_class_label():
-    pytest.importorskip("optimum")
-    import os
-    if not (os.path.isdir("onnx_model") or os.path.isdir("final_model")):
-        pytest.skip("train + export first")
+    if not _MODEL.exists():
+        pytest.skip("shipped model not present (git lfs pull)")
     r = classify("you are absolute trash, kill yourself", "chat")
     assert r["label"] in ("clean", "explicit", "implicit", "action")
     assert 0.0 <= r["score"] <= 1.0

@@ -3,7 +3,7 @@ from optimum.onnxruntime.configuration import AutoQuantizationConfig
 from transformers import AutoTokenizer
 
 
-def export(src: str = "final_model", dst: str = "onnx_model") -> None:
+def export(src: str = "final_model", dst: str = "src/ngword/model") -> None:
     model = ORTModelForSequenceClassification.from_pretrained(src, export=True)
     tok = AutoTokenizer.from_pretrained(src)
     model.save_pretrained(dst)

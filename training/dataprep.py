@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from ngword.labels import dedup, harmonize
+from training.labels import dedup, harmonize
 
 _DATA = Path(__file__).resolve().parents[2] / "data"
 _RAW = _DATA / "raw"

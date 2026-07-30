@@ -1,4 +1,4 @@
-from ngword.dataprep import stratified_split, _toxicn_class
+from training.dataprep import stratified_split, _toxicn_class
 
 
 def test_toxicn_toxic_first_collapse():

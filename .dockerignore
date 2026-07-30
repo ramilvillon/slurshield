@@ -1,0 +1,12 @@
+training/
+tests/
+docs/
+data/
+final_model/
+checkpoints/
+onnx_model/
+.superpowers/
+.git/
+**/__pycache__/
+.pytest_cache/
+*.egg-info/

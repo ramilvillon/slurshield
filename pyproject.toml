@@ -2,20 +2,26 @@
 name = "ngword"
 version = "0.1.0"
 requires-python = ">=3.11"
+# Runtime (deployment) deps only — torch/transformers/optimum are NOT needed to serve.
 dependencies = [
-    "torch",
-    "transformers>=4.44",
-    "accelerate>=0.26.0",
-    "datasets>=2.20",
-    "optimum[onnxruntime]>=1.21",
     "onnxruntime>=1.18",
+    "tokenizers>=0.20",
+    "numpy>=1.26",
     "pyahocorasick>=2.1",
-    "scikit-learn>=1.4",
-    "pandas>=2.2",
-    "pyarrow>=16",
 ]
 
 [project.optional-dependencies]
+# Everything needed to build the dataset, train, and export the model.
+training = [
+    "torch",
+    "transformers>=4.44",
+    "datasets>=2.20",
+    "optimum[onnxruntime]>=1.21",
+    "scikit-learn>=1.4",
+    "pandas>=2.2",
+    "pyarrow>=16",
+    "accelerate>=0.26",
+]
 dev = ["pytest>=8"]
 
 [build-system]
@@ -24,3 +30,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+# `ngword` resolves from src/, `training` from the repo root.
+pythonpath = ["src", "."]

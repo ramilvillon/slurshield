@@ -1,4 +1,4 @@
-from ngword.labels import harmonize, dedup
+from training.labels import harmonize, dedup
 
 
 def test_conda_direct_mapping():
