@@ -1,4 +1,4 @@
-# ngword
+# slurshield
 
 A multilingual profanity & toxicity filter for game backends — **usernames, titles, and chat** across **English, Tagalog, Chinese, and Japanese**. Ships a trained model in the repo and serves it from a ~400 MB CPU-only container.
 
@@ -16,12 +16,12 @@ Inference depends on **onnxruntime + tokenizers + numpy** only — no PyTorch, n
 ## Quick start
 
 ```bash
-git clone <repo> && cd ngword
+git clone <repo> && cd slurshield
 git lfs pull            # fetch the 135 MB int8 model (requires git-lfs)
 
 # --- run the server (Docker) ---
-docker build -t ngword .
-docker run -p 8000:8000 ngword
+docker build -t slurshield .
+docker run -p 8000:8000 slurshield
 
 curl -s -X POST localhost:8000/classify -d '{"text":"you are sh1t","kind":"chat"}'
 # {"kind":"chat","decision":"block","label":"explicit","score":1.0,"reason":"prefilter:shit"}
@@ -33,7 +33,7 @@ Or as a library:
 pip install .            # runtime deps only
 ```
 ```python
-from ngword.infer import classify
+from slurshield.infer import classify
 
 classify("gg wp everyone", "chat")     # {'decision':'allow','label':'clean', ...}
 classify("you are tr@sh", "chat")      # {'decision':'block','label':'explicit', ...}
@@ -53,7 +53,7 @@ classify("Scunthorpe", "name")         # {'decision':'allow','reason':'clean', .
 // chat labels: clean | explicit | implicit | action   (decision = block unless "clean")
 ```
 
-**HTTP** (`ngword.serve`, stdlib only):
+**HTTP** (`slurshield.serve`, stdlib only):
 
 | Method | Path | Body | Returns |
 |--------|------|------|---------|
@@ -106,7 +106,7 @@ classify(text, kind)
 ## Project layout
 
 ```
-src/ngword/          runtime (deploys): config, normalize, names, infer, serve
+src/slurshield/          runtime (deploys): config, normalize, names, infer, serve
   model/             int8 ONNX + tokenizer            (Git LFS)
 wordlists/           per-language slur lists + allowlist + impersonation
 training/            data pipeline + train + export   (not shipped; tracked)
@@ -127,7 +127,7 @@ python -m training.smoke_backbone              # confirm backbone runs on this m
 python -m training.dataprep                    # build train/val/test.parquet
 python -m training.train                       # fine-tune (overnight-scale on Apple M2 MPS)
 python -m training.evaluate_model              # per-language + adversarial report
-python -m training.export                      # -> src/ngword/model/ (int8 ONNX)
+python -m training.export                      # -> src/slurshield/model/ (int8 ONNX)
 ```
 
 Backbone: [`jhu-clsp/mmbert-small`](https://huggingface.co/jhu-clsp/mmbert-small) (140M, MIT). Fine-tuned with class-weighted loss, `max_length=48`, 4-class head. Trains in a couple hours on an M2; overfits after ~1 epoch (checkpoint selection keeps the best).

@@ -1,4 +1,4 @@
-from ngword.names import check_name, profanity_hit
+from slurshield.names import check_name, profanity_hit
 
 
 def test_profanity_hit_catches_obfuscation():

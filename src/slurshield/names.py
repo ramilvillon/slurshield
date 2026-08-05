@@ -3,7 +3,7 @@ from pathlib import Path
 
 import ahocorasick
 
-from ngword.normalize import fold
+from slurshield.normalize import fold
 
 _WL_DIR = Path(__file__).resolve().parents[2] / "wordlists"
 

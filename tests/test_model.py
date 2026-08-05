@@ -4,7 +4,7 @@ import numpy as np
 import onnxruntime as ort
 import pytest
 
-_MODEL = Path(__file__).resolve().parents[1] / "src" / "ngword" / "model" / "model_quantized.onnx"
+_MODEL = Path(__file__).resolve().parents[1] / "src" / "slurshield" / "model" / "model_quantized.onnx"
 
 
 def test_shipped_int8_model_loads_and_outputs_four_classes():

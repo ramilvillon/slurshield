@@ -1,2 +1,2 @@
-src/ngword/model/*.onnx filter=lfs diff=lfs merge=lfs -text
-src/ngword/model/tokenizer.json filter=lfs diff=lfs merge=lfs -text
+src/slurshield/model/*.onnx filter=lfs diff=lfs merge=lfs -text
+src/slurshield/model/tokenizer.json filter=lfs diff=lfs merge=lfs -text

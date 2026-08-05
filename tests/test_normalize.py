@@ -1,4 +1,4 @@
-from ngword.normalize import fold
+from slurshield.normalize import fold
 
 
 def test_lowercases_and_strips_zero_width():

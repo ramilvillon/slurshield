@@ -1,5 +1,5 @@
 [project]
-name = "ngword"
+name = "slurshield"
 version = "0.1.0"
 requires-python = ">=3.11"
 # Runtime (deployment) deps only — torch/transformers/optimum are NOT needed to serve.
@@ -32,5 +32,5 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.pytest.ini_options]
-# `ngword` resolves from src/, `training` from the repo root.
+# `slurshield` resolves from src/, `training` from the repo root.
 pythonpath = ["src", "."]

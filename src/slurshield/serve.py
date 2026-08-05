@@ -9,7 +9,7 @@ import json
 import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from ngword.infer import classify
+from slurshield.infer import classify
 
 _VALID_KINDS = {"name", "title", "chat"}
 
@@ -50,7 +50,7 @@ class _Handler(BaseHTTPRequestHandler):
 def main(host: str = "0.0.0.0", port: int = 8000) -> None:
     classify("warmup", "chat")  # load model/tokenizer so the first request isn't slow
     server = ThreadingHTTPServer((host, port), _Handler)
-    print(f"ngword serving on {host}:{port}", flush=True)
+    print(f"slurshield serving on {host}:{port}", flush=True)
     server.serve_forever()
 
 

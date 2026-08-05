@@ -5,7 +5,7 @@ import torch
 from sklearn.metrics import classification_report, f1_score
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from ngword import config
+from slurshield import config
 
 _DATA = Path(__file__).resolve().parents[2] / "data"
 
@@ -60,7 +60,7 @@ def adversarial_report(model_dir: str = "final_model") -> dict:
         print("\nNo adversarial sets in data/adversarial/ — skipping.")
         return {}
 
-    from ngword.infer import classify  # measure the SHIPPING pipeline (pre-filter + model)
+    from slurshield.infer import classify  # measure the SHIPPING pipeline (pre-filter + model)
     out = {}
     print("\n=== Adversarial robustness (block = predicted not-clean) ===")
     for f in files:

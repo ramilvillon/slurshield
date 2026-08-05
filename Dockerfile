@@ -12,4 +12,4 @@ COPY wordlists/ ./wordlists/
 
 ENV PYTHONPATH=/app/src PORT=8000
 EXPOSE 8000
-CMD ["python", "-m", "ngword.serve"]
+CMD ["python", "-m", "slurshield.serve"]

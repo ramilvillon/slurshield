@@ -11,7 +11,7 @@ from sklearn.utils.class_weight import compute_class_weight
 from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                           DataCollatorWithPadding, Trainer, TrainingArguments)
 
-from ngword import config
+from slurshield import config
 
 _DATA = Path(__file__).resolve().parents[2] / "data"
 

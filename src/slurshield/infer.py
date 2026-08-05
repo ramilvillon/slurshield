@@ -5,8 +5,8 @@ import numpy as np
 import onnxruntime as ort
 from tokenizers import Tokenizer
 
-from ngword import config
-from ngword.names import check_name, profanity_hit
+from slurshield import config
+from slurshield.names import check_name, profanity_hit
 
 _MATCHER_KINDS = {"name", "title"}
 _MODEL_DIR = Path(__file__).resolve().parent / "model"

@@ -2,7 +2,7 @@
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from ngword import config
+from slurshield import config
 
 
 def try_backbone(name: str) -> bool:

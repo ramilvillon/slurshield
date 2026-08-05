@@ -11,5 +11,5 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 
-# NOTE: the deployable model lives in src/ngword/model/ and IS tracked (via Git LFS).
+# NOTE: the deployable model lives in src/slurshield/model/ and IS tracked (via Git LFS).
 # Do not add a blanket *.onnx ignore — it would exclude the shipped model.

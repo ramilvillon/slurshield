@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from ngword.infer import classify
+from slurshield.infer import classify
 
-_MODEL = Path(__file__).resolve().parents[1] / "src" / "ngword" / "model" / "model_quantized.onnx"
+_MODEL = Path(__file__).resolve().parents[1] / "src" / "slurshield" / "model" / "model_quantized.onnx"
 
 
 def test_name_routes_to_matcher():
