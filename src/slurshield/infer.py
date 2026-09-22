@@ -32,7 +32,8 @@ def _chat_model(text: str) -> dict:
     probs /= probs.sum()
     idx = int(probs.argmax())
     label = config.CLASS_NAMES[idx]
-    return {"kind": "chat", "decision": "allow" if label == "clean" else "block",
+    # `action` is game-command chat (en) / discrimination discussion (zh), not toxicity.
+    return {"kind": "chat", "decision": "block" if label in config.BLOCK_LABELS else "allow",
             "label": label, "score": float(probs[idx]), "reason": label}
 
 

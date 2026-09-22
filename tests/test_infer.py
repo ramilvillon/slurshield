@@ -31,3 +31,9 @@ def test_chat_returns_four_class_label():
     r = classify("you are absolute trash, kill yourself", "chat")
     assert r["label"] in ("clean", "explicit", "implicit", "action")
     assert 0.0 <= r["score"] <= 1.0
+
+def test_chat_action_label_allows_game_commands():
+    if not _MODEL.exists():
+        pytest.skip("shipped model not present (git lfs pull)")
+    r = classify("report him", "chat")
+    assert r["label"] == "action" and r["decision"] == "allow"

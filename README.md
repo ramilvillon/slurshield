@@ -50,7 +50,7 @@ classify("Scunthorpe", "name")         # {'decision':'allow','reason':'clean', .
 ```jsonc
 { "kind": "chat", "decision": "block", "label": "explicit", "score": 0.94, "reason": "explicit" }
 // name/title: label & score are null; reason is the matched term / "impersonation" / "clean"
-// chat labels: clean | explicit | implicit | action   (decision = block unless "clean")
+// chat labels: clean | explicit | implicit | action   (decision = block only for explicit | implicit)
 ```
 
 **HTTP** (`slurshield.serve`, stdlib only):
