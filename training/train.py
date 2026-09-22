@@ -13,7 +13,7 @@ from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
 
 from slurshield import config
 
-_DATA = Path(__file__).resolve().parents[2] / "data"
+_DATA = Path(__file__).resolve().parents[1] / "data"
 
 
 class WeightedTrainer(Trainer):
@@ -43,7 +43,8 @@ def _metrics(eval_pred):
 def main():
     device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu")
     tok = AutoTokenizer.from_pretrained(config.BACKBONE)
-    model = AutoModelForSequenceClassification.from_pretrained(config.BACKBONE, num_labels=4).to(device)
+    model = AutoModelForSequenceClassification.from_pretrained(config.BACKBONE, num_labels=4,
+        id2label=dict(enumerate(config.CLASS_NAMES)), label2id={n: i for i, n in enumerate(config.CLASS_NAMES)}).to(device)
 
     train_ds, val_ds = _load("train"), _load("val")
     weights = compute_class_weight("balanced", classes=np.arange(len(config.CLASS_NAMES)),

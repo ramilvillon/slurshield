@@ -7,7 +7,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from slurshield import config
 
-_DATA = Path(__file__).resolve().parents[2] / "data"
+_DATA = Path(__file__).resolve().parents[1] / "data"
 
 
 def _load(model_dir: str):
