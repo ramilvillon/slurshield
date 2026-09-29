@@ -6,7 +6,7 @@ import onnxruntime as ort
 from tokenizers import Tokenizer
 
 from slurshield import config
-from slurshield.names import check_name, profanity_hit
+from slurshield.names import check_name, profanity_hit, profanity_spans
 
 _MATCHER_KINDS = {"name", "title"}
 _MODEL_DIR = Path(__file__).resolve().parent / "model"
@@ -59,3 +59,18 @@ def classify(text: str, kind: str) -> dict:
                 "score": 1.0, "reason": f"prefilter:{hit}"}
 
     return _chat_model(text)
+
+
+def redact(text: str, mask: str = "*") -> str:
+    """Mask word-list profanity, preserving length. `mask` is a single char.
+
+    Lexical hits only. The chat model emits a sentence label with no spans, so text it
+    flags with no word-list hit ("you are trash") comes back unchanged — classify() still
+    blocks it. Span-level redaction of contextual toxicity needs a token-classification
+    head, i.e. a retrain.
+    """
+    if not isinstance(text, str):
+        text = str(text or "")
+    for start, end, _ in sorted(profanity_spans(text), reverse=True):
+        text = text[:start] + mask * (end - start) + text[end:]
+    return text

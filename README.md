@@ -24,7 +24,8 @@ docker build -t slurshield .
 docker run -p 8000:8000 slurshield
 
 curl -s -X POST localhost:8000/classify -d '{"text":"you are sh1t","kind":"chat"}'
-# {"kind":"chat","decision":"block","label":"explicit","score":1.0,"reason":"prefilter:shit"}
+# {"kind":"chat","decision":"block","label":"explicit","score":1.0,"reason":"prefilter:shit",
+#  "masked":"you are ****"}
 ```
 
 Or as a library:
@@ -33,12 +34,16 @@ Or as a library:
 pip install .            # runtime deps only
 ```
 ```python
-from slurshield.infer import classify
+from slurshield.infer import classify, redact
 
 classify("gg wp everyone", "chat")     # {'decision':'allow','label':'clean', ...}
 classify("you are tr@sh", "chat")      # {'decision':'block','label':'explicit', ...}
 classify("xX_admin_Xx", "name")        # {'decision':'block','reason':'impersonation', ...}
 classify("Scunthorpe", "name")         # {'decision':'allow','reason':'clean', ...}
+
+redact("you are sh1t")                 # 'you are ****'
+redact("p.u.t.a.n.g.i.n.a stop")       # '***************** stop'
+redact("you are absolute trash")       # unchanged — model-flagged, no word to mask
 ```
 
 ---
@@ -53,11 +58,19 @@ classify("Scunthorpe", "name")         # {'decision':'allow','reason':'clean', .
 // chat labels: clean | explicit | implicit | action   (decision = block only for explicit | implicit)
 ```
 
+**`redact(text: str, mask: str = "*") -> str`** — mask profanity, preserving length.
+
+Word-list hits only. The chat model returns a sentence label with no spans, so text it
+flags with no lexical hit (`"you are trash"`) is returned unchanged — `classify()` still
+blocks it. Span-level redaction of contextual toxicity needs a token-classification head,
+i.e. a retrain. Separator evasion (`p.u.t.a`) is masked for slurs of 5+ chars only, the
+same length tier the matcher uses.
+
 **HTTP** (`slurshield.serve`, stdlib only):
 
 | Method | Path | Body | Returns |
 |--------|------|------|---------|
-| `POST` | `/classify` | `{"text": "...", "kind": "chat"}` | the verdict JSON above |
+| `POST` | `/classify` | `{"text": "...", "kind": "chat"}` | the verdict JSON above, plus `"masked"` |
 | `GET`  | `/health` | — | `{"status":"ok"}` |
 
 ---

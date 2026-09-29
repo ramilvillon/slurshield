@@ -3,7 +3,7 @@ from pathlib import Path
 
 import ahocorasick
 
-from slurshield.normalize import fold
+from slurshield.normalize import fold, fold_map
 
 _WL_DIR = Path(__file__).resolve().parents[2] / "wordlists"
 
@@ -15,7 +15,7 @@ _LONG_MIN_LEN = 5
 
 # Split on whitespace/punctuation/underscore but KEEP Unicode letters (incl. homoglyphs
 # like Cyrillic 'а') and digits in the token, so fold() can canonicalize them.
-_SEP = re.compile(r"[\W_]+")
+_TOKEN = re.compile(r"[^\W_]+")
 _CAMEL = re.compile(r"(?<=[a-z0-9])(?=[A-Z])")
 
 
@@ -31,15 +31,22 @@ def _load_lines(name: str) -> list[str]:
     return out
 
 
-def _raw_tokens(text: str) -> set[str]:
-    # Split on separators and camelCase; return RAW pieces (unfolded) so the caller
-    # can both fold them and strip trailing digits before folding.
-    out = set()
-    for chunk in _SEP.split(text):
-        for piece in _CAMEL.sub(" ", chunk).split():
-            if piece:
-                out.add(piece)
+def _raw_token_spans(text: str) -> list[tuple[int, int, str]]:
+    # Split on separators and camelCase; return RAW pieces (unfolded) with their offsets
+    # so the caller can fold them, strip trailing digits, and still locate them.
+    out = []
+    for m in _TOKEN.finditer(text):
+        chunk, base = m.group(), m.start()
+        start = 0
+        for cut in [c.start() for c in _CAMEL.finditer(chunk)] + [len(chunk)]:
+            if chunk[start:cut]:
+                out.append((base + start, base + cut, chunk[start:cut]))
+            start = cut
     return out
+
+
+def _raw_tokens(text: str) -> set[str]:
+    return {t for _, _, t in _raw_token_spans(text)}
 
 
 def _token_forms(raw: str) -> set[str]:
@@ -86,21 +93,29 @@ def _covered_by_allowlist(shadow: str, start: int, end: int) -> bool:
     return False
 
 
-def profanity_hit(text: str) -> str | None:
-    # Return the matched slur (deobfuscated) or None. Length-tiered + allowlist-aware,
-    # so "class"/"assemble" don't trip on "ass". Shared by check_name and the chat
-    # pre-filter — catches leetspeak/unicode/homoglyph evasion the raw-text model misses.
-    for raw in _raw_tokens(text):
+def profanity_spans(text: str) -> list[tuple[int, int, str]]:
+    # Every slur in `text` as (start, end, deobfuscated term), offsets into the ORIGINAL
+    # string, ordered by position. Length-tiered + allowlist-aware, so "class"/"assemble"
+    # don't trip on "ass". Catches the leetspeak/unicode/homoglyph evasion the model misses.
+    out = []
+    for start, end, raw in _raw_token_spans(text):
         hit = _token_forms(raw) & _SHORT_PROFANITY
         if hit:
-            return sorted(hit)[0]
+            out.append((start, end, sorted(hit)[0]))  # short slurs match whole tokens only
 
-    shadow = fold(text)
+    shadow, src = fold_map(text)
     for end_idx, term in _LONG_PROFANITY.iter(shadow):
         start_idx = end_idx - len(term) + 1
         if not _covered_by_allowlist(shadow, start_idx, end_idx):
-            return term
-    return None
+            out.append((src[start_idx][0], src[end_idx][1], term))
+    return sorted(out)
+
+
+def profanity_hit(text: str) -> str | None:
+    # Return the matched slur (deobfuscated) or None. Shared by check_name and the chat
+    # pre-filter, both of which only need to know whether anything matched.
+    spans = profanity_spans(text)
+    return spans[0][2] if spans else None
 
 
 def check_name(text: str) -> dict:
