@@ -1,6 +1,6 @@
 """Minimal stdlib HTTP server exposing classify() — the container entrypoint.
 
-  POST /classify   {"text": "...", "kind": "chat|name|title"}  -> verdict JSON
+  POST /classify   {"text": "...", "kind": "chat|name|title"}  -> verdict JSON + "masked"
   GET  /health     -> {"status": "ok"}
 
 No web framework: stdlib http.server only, to keep the deployment image small.
@@ -9,7 +9,7 @@ import json
 import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from slurshield.infer import classify
+from slurshield.infer import classify, redact
 
 _VALID_KINDS = {"name", "title", "chat"}
 
@@ -41,7 +41,8 @@ class _Handler(BaseHTTPRequestHandler):
         if kind not in _VALID_KINDS:
             self._send(400, {"error": f"kind must be one of {sorted(_VALID_KINDS)}"})
             return
-        self._send(200, classify(data.get("text", ""), kind))
+        text = data.get("text", "")
+        self._send(200, {**classify(text, kind), "masked": redact(text)})
 
     def log_message(self, *args):  # silence default request logging
         pass

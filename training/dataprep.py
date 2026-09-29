@@ -6,7 +6,7 @@ import pandas as pd
 
 from training.labels import dedup, harmonize
 
-_DATA = Path(__file__).resolve().parents[2] / "data"
+_DATA = Path(__file__).resolve().parents[1] / "data"
 _RAW = _DATA / "raw"
 
 

@@ -24,7 +24,8 @@ docker build -t slurshield .
 docker run -p 8000:8000 slurshield
 
 curl -s -X POST localhost:8000/classify -d '{"text":"you are sh1t","kind":"chat"}'
-# {"kind":"chat","decision":"block","label":"explicit","score":1.0,"reason":"prefilter:shit"}
+# {"kind":"chat","decision":"block","label":"explicit","score":1.0,"reason":"prefilter:shit",
+#  "masked":"you are ****"}
 ```
 
 Or as a library:
@@ -33,12 +34,16 @@ Or as a library:
 pip install .            # runtime deps only
 ```
 ```python
-from slurshield.infer import classify
+from slurshield.infer import classify, redact
 
 classify("gg wp everyone", "chat")     # {'decision':'allow','label':'clean', ...}
 classify("you are tr@sh", "chat")      # {'decision':'block','label':'explicit', ...}
 classify("xX_admin_Xx", "name")        # {'decision':'block','reason':'impersonation', ...}
 classify("Scunthorpe", "name")         # {'decision':'allow','reason':'clean', ...}
+
+redact("you are sh1t")                 # 'you are ****'
+redact("p.u.t.a.n.g.i.n.a stop")       # '***************** stop'
+redact("you are absolute trash")       # unchanged — model-flagged, no word to mask
 ```
 
 ---
@@ -50,14 +55,22 @@ classify("Scunthorpe", "name")         # {'decision':'allow','reason':'clean', .
 ```jsonc
 { "kind": "chat", "decision": "block", "label": "explicit", "score": 0.94, "reason": "explicit" }
 // name/title: label & score are null; reason is the matched term / "impersonation" / "clean"
-// chat labels: clean | explicit | implicit | action   (decision = block unless "clean")
+// chat labels: clean | explicit | implicit | action   (decision = block only for explicit | implicit)
 ```
+
+**`redact(text: str, mask: str = "*") -> str`** — mask profanity, preserving length.
+
+Word-list hits only. The chat model returns a sentence label with no spans, so text it
+flags with no lexical hit (`"you are trash"`) is returned unchanged — `classify()` still
+blocks it. Span-level redaction of contextual toxicity needs a token-classification head,
+i.e. a retrain. Separator evasion (`p.u.t.a`) is masked for slurs of 5+ chars only, the
+same length tier the matcher uses.
 
 **HTTP** (`slurshield.serve`, stdlib only):
 
 | Method | Path | Body | Returns |
 |--------|------|------|---------|
-| `POST` | `/classify` | `{"text": "...", "kind": "chat"}` | the verdict JSON above |
+| `POST` | `/classify` | `{"text": "...", "kind": "chat"}` | the verdict JSON above, plus `"masked"` |
 | `GET`  | `/health` | — | `{"status":"ok"}` |
 
 ---
@@ -111,7 +124,7 @@ src/slurshield/          runtime (deploys): config, normalize, names, infer, ser
 wordlists/           per-language slur lists + allowlist + impersonation
 training/            data pipeline + train + export   (not shipped; tracked)
 tests/               35 tests
-data/                datasets, parquet, adversarial   (gitignored; SOURCES.md tracked)
+data/                datasets, parquet, adversarial   (gitignored — local only, not distributed)
 Dockerfile           ~400 MB CPU runtime image
 ```
 
@@ -122,7 +135,7 @@ Dockerfile           ~400 MB CPU runtime image
 ```bash
 pip install ".[training]"                      # torch, transformers, datasets, optimum, ...
 
-# COLD + ToxiCN need manual download — see data/SOURCES.md (everything else auto-fetches)
+# COLD + ToxiCN need manual download from the upstream repos linked below (rest auto-fetches)
 python -m training.smoke_backbone              # confirm backbone runs on this machine
 python -m training.dataprep                    # build train/val/test.parquet
 python -m training.train                       # fine-tune (overnight-scale on Apple M2 MPS)
@@ -151,6 +164,8 @@ Backbone: [`jhu-clsp/mmbert-small`](https://huggingface.co/jhu-clsp/mmbert-small
 
 ## Data & licensing
 
-Trained on [CONDA](https://github.com/usydnlp/CONDA) (en), [mginoben](https://huggingface.co/datasets/mginoben/tagalog-profanity-dataset) (tl), [COLD](https://github.com/thu-coai/COLDataset) + [ToxiCN](https://github.com/DUT-lujunyu/ToxiCN) + [textdetox](https://huggingface.co/datasets/textdetox/multilingual_toxicity_dataset) (zh), textdetox + [LLM-jp Toxicity](https://huggingface.co/datasets/p1atdev/LLM-jp-Toxicity-Dataset) (ja). See `data/SOURCES.md`.
+Trained on [CONDA](https://github.com/usydnlp/CONDA) (en), [mginoben](https://huggingface.co/datasets/mginoben/tagalog-profanity-dataset) (tl), [COLD](https://github.com/thu-coai/COLDataset) + [ToxiCN](https://github.com/DUT-lujunyu/ToxiCN) + [textdetox](https://huggingface.co/datasets/textdetox/multilingual_toxicity_dataset) (zh), textdetox + [LLM-jp Toxicity](https://huggingface.co/datasets/p1atdev/LLM-jp-Toxicity-Dataset) (ja).
+The datasets and the exact prep recipes are not redistributed here — they carry their own
+academic licenses; fetch them from the links above.
 
 > **Note:** some training datasets (`mginoben`, CONDA) have unclear/absent licenses. Fine for research/dev; **clear or replace them before any commercial deployment.**

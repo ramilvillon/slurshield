@@ -21,19 +21,19 @@
   "hidden_activation": "gelu",
   "hidden_size": 384,
   "id2label": {
-    "0": "LABEL_0",
-    "1": "LABEL_1",
-    "2": "LABEL_2",
-    "3": "LABEL_3"
+    "0": "clean",
+    "1": "explicit",
+    "2": "implicit",
+    "3": "action"
   },
   "initializer_cutoff_factor": 2.0,
   "initializer_range": 0.02,
   "intermediate_size": 1152,
   "label2id": {
-    "LABEL_0": 0,
-    "LABEL_1": 1,
-    "LABEL_2": 2,
-    "LABEL_3": 3
+    "clean": 0,
+    "explicit": 1,
+    "implicit": 2,
+    "action": 3
   },
   "layer_norm_eps": 1e-05,
   "local_attention": 128,
